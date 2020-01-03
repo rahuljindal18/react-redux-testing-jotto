@@ -10,7 +10,7 @@ describe('getLetterMatchCount', () => {
         const letterMatchCount = getLetterMatchCount('train',secretWord);
         expect(letterMatchCount).toBe(3);
     });
-    test('returns correct count whwn there are duplicate charaters in the guess', () => {
+    test('returns correct count when there are duplicate charaters in the guess', () => {
         const letterMatchCount = getLetterMatchCount('parka',secretWord);
         expect(letterMatchCount).toBe(3);
     });
