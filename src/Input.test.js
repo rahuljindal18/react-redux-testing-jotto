@@ -2,15 +2,13 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import { findByTestAttr, storeFactory } from '../test/testUtils';
-import Input from './Input';
+import Input, {UnconnectedInput} from './Input';
 
 const setup = (initialState={}) => {
     const store = storeFactory(initialState);
     const wrapper = shallow(<Input store={store} />).dive().dive();
     return wrapper;
 }
-
-
 
 describe('render', () => {
     describe('word has not been guessed', () => {
@@ -53,6 +51,41 @@ describe('render', () => {
     });
 });
 
-describe('state update', () => {
+describe('redux props', () => {
+    test('has success piece of state as prop', () => {
+        const success = true;
+        const wrapper = setup({success});
+        const successProp = wrapper.instance().props.success;
+        expect(successProp).toBe(success);
+    });
+    test('`guessWord` action creator is a function prop',() => {
+        const wrapper = setup();
+        const guessWordProp = wrapper.instance().props.guessWord;
+        expect(guessWordProp).toBeInstanceOf(Function);
+    });
+});
 
+describe('`guessWord` action creator call', () => {
+    let guessWordMock;
+    let wrapper;
+    const guessedWord = "train";
+    beforeEach(() => {
+        guessWordMock = jest.fn();
+        wrapper = shallow(<UnconnectedInput guessWord={guessWordMock}/>);
+        wrapper.setState({currentGuess: guessedWord});
+        const submitButton = findByTestAttr(wrapper,'submit-button');
+        submitButton.simulate('click',{ preventDefault() {} });
+    });
+
+    test('calls `guessWord` when button is clicked', () => {
+        const guessWordCallCount = guessWordMock.mock.calls.length;
+        expect(guessWordCallCount).toBe(1);
+    });
+    test('calls `guessWord` with input value as argument', () => {
+        const guessWordArg = guessWordMock.mock.calls[0][0];
+        expect(guessWordArg).toBe(guessedWord);
+    });
+    test('input box clears on submit', () => {
+        expect(wrapper.state('currentGuess')).toBe('');
+    });
 });
